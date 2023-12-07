@@ -24,7 +24,7 @@ pipeline{
         stage('Push the docker image') {
             steps{
                 withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerHubPass')]) {
-                    sh "docker login -u coldman47 -p $dockerHubPass"
+                    sh "docke login -u coldman47 -p $dockerHubPass"
                 }
                 sh 'docker push coldman47/triang7:1.0.0'
             }
