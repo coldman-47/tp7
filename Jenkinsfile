@@ -1,53 +1,33 @@
-pipeline {
+pipeline{
     agent any
-
-     tools {
-        maven 'maven'
-    }
-
-    stages {
-        stage('git checkout') {
-            steps {
-                git credentialsId: 'ec8151e0-6d82-411d-a06d-07e4b50db170',url:'https://github.com/Oumar26/TP7_DEVOPS.git'
-            }
-        }
-
-        stage('Build the application'){
+    stages{
+        stage('git checkout'){
             steps{
-                bat 'cd projetSB/spring-boot-app && mvn clean package'
+                git credentialsId: 'ccb9af01-4414-467d-b87e-90ddb6512c57', url: 'https://github.com/coldman-47/tp7'
             }
         }
-
-        stage("Test Application"){
-           steps {
-                 bat "cd projetSB/spring-boot-app && mvn test"
-               }
-       }
-
-       stage('Build the docker image'){
-
-        steps {
-          bat 'cd projetSB/spring-boot-app && docker build -t oumar22/tp7devops:1.0.0 .'
-        }
-
-       }
-
-        stage('Push the docker image'){
-
-        steps{
-            withCredentials([string(credentialsId: 'dockerhubpass', variable:'dockerHubPass')]) {
-                bat "docker login -u oumar22 -p $dockerHubPass"
+        stage('Build the app'){
+            steps{
+                sh 'mvn clean package'
             }
-
-            bat 'docker push oumar22/tp7devops:1.0.0'
-
-            }
-
         }
-
-
-
-
+        stage('Unit Test Execution') {
+            steps{
+                sh 'mvn test'
+            }
+        }
+        stage('Build the docker image') {
+            steps{
+                sh 'docker build --tag coldman47/triang7:1.0.0 .'
+            }
+        }
+        stage('Push the docker image') {
+            steps{
+                withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerHubPass')]) {
+                    sh "docker login -u coldman47 -p $dockerHubPass"
+                }
+                sh 'docker push coldman47/triang7:1.0.0'
+            }
+        }
     }
-
 }
